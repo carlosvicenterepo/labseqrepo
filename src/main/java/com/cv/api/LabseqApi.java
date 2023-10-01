@@ -5,6 +5,9 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.Cache;
 
@@ -26,5 +29,10 @@ public interface LabseqApi {
     @GET
     @Cache
     @Path("/{n}")
+    @Operation(summary = "Returning a value from the labseq sequence.")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200", description = "Success."),
+            @APIResponse(responseCode = "400", description = "Bad request.")
+    })
     LabseqRecord labseq(final @PathParam("n") Long n);
 }
