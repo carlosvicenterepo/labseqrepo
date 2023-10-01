@@ -1,9 +1,28 @@
 version: '3.9'
 services:
 
-  service:
+  be:
     build:
-      context: .
+      context: ./labseq_be
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    container_name: backend
+    networks:
+      - network
+
+  fe:
+    build:
+      context: ./labseq_fe
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    container_name: frontend
+    volumes:
+      - ./labseq_fe/src:/usr/src/app/src
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
