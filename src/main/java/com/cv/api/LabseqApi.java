@@ -26,5 +26,5 @@ public interface LabseqApi {
     @GET
     @Cache
     @Path("/{n}")
-    LabseqRecord labseq(@PathParam("n") Long n);
+    LabseqRecord labseq(final @PathParam("n") Long n);
 }

@@ -10,6 +10,5 @@ RUN mvn -f /home/app/pom.xml clean package
 #
 FROM openjdk:17
 COPY --from=build  /home/app/target/quarkus-app/ /opt/maven/deployments/
-WORKDIR /opt/maven/deployments
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/opt/maven/deployments/quarkus-run.jar"]
+CMD ["java","-jar","/opt/maven/deployments/quarkus-run.jar"]

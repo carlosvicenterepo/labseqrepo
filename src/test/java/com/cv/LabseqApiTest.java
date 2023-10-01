@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.lessThan;
 
 /**
@@ -29,7 +30,7 @@ public class LabseqApiTest {
 
     @ParameterizedTest
     @ValueSource(ints = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000})
-    void testLabSeq(final int n) {
+    void testTimeLimit(final int n) {
         given()
                     .pathParam("n", n)
                .when()
@@ -37,5 +38,18 @@ public class LabseqApiTest {
                .then()
                     .statusCode(200)
                     .time(lessThan(10000L));
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(ints = {50})
+    void testLabSeqOne(final int n) {
+        given()
+                    .pathParam("n", n)
+                .when()
+                    .get("/{n}")
+                .then()
+                    .statusCode(200)
+                    .body(containsString("\"value\":\"8505\""));
     }
 }

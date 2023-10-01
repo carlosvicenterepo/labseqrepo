@@ -1,59 +1,56 @@
-# labseq
+# **Getting Started**
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+### **Labseq Challenge**
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+### **Technologies**
 
-## Running the application in dev mode
+- Java 17
+- Quarkus
+- Lombok for reducing boilerplate code
 
-You can run your application in dev mode that enables live coding using:
+### **Folder Structure**
 
-```shell script
-./mvnw compile quarkus:dev
+- `src/main/java/com/cv/api`: API endpoints
+- `src/main/java/com/cv/dto`: DTOs
+- `src/main/java/com/cv/service`: Service layer.
+- `src/test/java`: Unit tests.
+
+### **Start-up**
+
+```
+docker compose up
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+### **Instructions**
 
-## Packaging and running the application
+The Swagger documentation can be accessed at: http://localhost:8080/q/swagger-ui/
 
-The application can be packaged using:
+#### Labseq Resource
 
-```shell script
-./mvnw package
+```
+  GET http://localhost:8080/labseq/10000
+  
+  curl -X 'GET' 'http://localhost:8080/labseq/10000' -H 'accept: application/json'
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+| Parâmetro | Tipo      | Descrição |
+|:----------|:----------|:----------|
+| `n`       | `Integer` | Value     |
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+### **Approach and Decisions**
 
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+####  Use of cache (HashMap) with incremental updates:
 ```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
+One of the key decisions made in the project was the implementation of a cache, represented by a HashMap, which is initially loaded when the server starts with initial values from 0 to 3.
+The cache was introduced to optimize access to the "labseq" sequence values. Loading initial values into the cache allows the system to respond more quickly to initial requests without the need for lengthy calculations.
+Whenever a value from the "labseq" sequence is requested, the cache is updated incrementally. This means that the system does not recalculate the entire sequence from scratch for each request but always starts from the maximum value already in the cache.
+This approach saves computational resources and speeds up responses, as it avoids complete recalculations of the sequence every time a request is made.
 ```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+####  DTO Response in String format due to exponential value:
 ```
-
-You can then execute your native executable with: `./target/labseq-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Related Guides
-
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes
-  with Swagger UI
+The "labseq" sequence has the characteristic of growing exponentially as values progress. This means that the resulting numbers can be extremely large in magnitude.
+It was decided that the response of the DTO (Data Transfer Object) carrying the values of the "labseq" sequence would be represented as a string instead of using a numeric type such as BigInteger.
+The reason for this decision is that BigInteger may not be able to support such large numbers due to memory limitations or the maximum size of variables (range from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807).
+By representing the values as strings, you can accommodate responses of variable size without worrying about potential variable overflows or memory constraints.
+Furthermore, using strings allows clients to receive the values in a readable and manipulable format, regardless of how large they are, facilitating the processing and display of results.
+```

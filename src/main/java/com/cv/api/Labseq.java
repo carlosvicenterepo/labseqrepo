@@ -4,6 +4,7 @@ import com.cv.dto.LabseqRecord;
 import com.cv.service.LabseqService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import lombok.Getter;
 
 /**
@@ -22,6 +23,10 @@ public class Labseq implements LabseqApi{
 
     @Override
     public LabseqRecord labseq(final Long n)  {
+        if (n < 0) {
+            throw new BadRequestException();
+        }
+
         return new LabseqRecord(getService().labseq(n).toString());
     }
 }
