@@ -8,9 +8,13 @@ import {Subject, takeUntil} from "rxjs";
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
+  get responseValue(): String {
+    return this._responseValue;
+  }
+
   title = 'labseq_fe';
 
-  responseValue = '';
+  _responseValue = "";
   constructor(private appService: AppService) {}
 
   destroy$: Subject<boolean> = new Subject<boolean>();
@@ -18,8 +22,12 @@ export class AppComponent {
   onSubmit(event: any) {
     this.appService.labseq(event.target.value.value).pipe(takeUntil(this.destroy$)).subscribe(data => {
       // this.responseValue = data;
-      this.responseValue = JSON.parse(JSON.stringify(data));
-      console.log('message::::', data);
+      this._responseValue = JSON.stringify(data, undefined, 2);
+      console.log('message::::', this._responseValue);
     });
+  }
+
+  clean() {
+    this._responseValue = "";
   }
 }

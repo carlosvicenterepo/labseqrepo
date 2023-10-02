@@ -1,14 +1,14 @@
-FROM node:18 AS ui-build
-WORKDIR /usr/src/app
-COPY / ./labseq_fe/
-RUN cd labseq_fe && npm install @angular/cli && npm install && npm run build
-
-FROM node:18 AS server-build
-WORKDIR /usr/src/app
-COPY --from=ui-build /usr/src/app/labseq_fe/dist ./labseq_fe/dist
-COPY *.json ./
-COPY src/* ./
+FROM node:18 as builder
+WORKDIR /app
+COPY package*.json ./
+COPY src/labseq.conf /app
 RUN npm install
+COPY . .
+RUN npm run build
 
+
+FROM nginx:alpine
+COPY --from=builder /app/dist/labseq_fe/ /usr/share/nginx/html
+COPY --from=builder /app/labseq.conf /etc/nginx/conf.d/
 EXPOSE 4200
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]
